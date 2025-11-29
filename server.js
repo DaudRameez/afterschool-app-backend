@@ -3,6 +3,7 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import { MongoClient, ObjectId } from 'mongodb'
 import lessonsRoutes from './routes/activitys.js'
+import orderRoutes from './routes/order.js'
 
 dotenv.config()
 
@@ -29,7 +30,9 @@ app.use(( req, res, next ) => {
 
 //Routes 
 app.use('/api/lessons', lessonsRoutes)
+app.use('/api/orders', orderRoutes)
 
 //Start Server 
 const PORT = process.env.PORT || 3000
-app.listen(PORT, () => console.log('server running on port ${PORT}')) 
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+
