@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
     res.json({
       success: true,
       message: 'Order placed successfully',
-      orderId: result.insertedId // <-- MongoDB's insertedId
+      orderId: result.insertedId 
     })
   } catch (err) {
     console.error(err)
