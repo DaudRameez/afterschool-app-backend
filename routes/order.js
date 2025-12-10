@@ -3,7 +3,6 @@ import { ObjectId } from 'mongodb'
 
 const router = express.Router()
 // POST new order
-// order.js (router)
 router.post('/', async (req, res) => {
   try {
     const db = req.app.locals.db
