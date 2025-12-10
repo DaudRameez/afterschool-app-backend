@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   try {
     const db = req.app.locals.db
     const lessons = await db.collection('activities').find({}).toArray()
-    res.json(lessons) // this should return the array of lessons
+    res.json(lessons) 
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to fetch lessons' })
