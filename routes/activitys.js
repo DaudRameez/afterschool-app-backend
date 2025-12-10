@@ -15,18 +15,6 @@ router.get('/', async (req, res) => {
   }
 })
 
-// POST new order
-router.post('/order', async (req, res) => {
-  try {
-    const db = req.app.locals.db
-    const { name, phone, items } = req.body
-    const result = await db.collection('orders').insertOne({ name, phone, items })
-    res.json(result)
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ error: 'Failed to save order' })
-  }
-})
 
 // PUT update lesson spaces
 router.put('/:id', async (req, res) => {
