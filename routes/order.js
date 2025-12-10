@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
 })
 
 
-// GET all orders
+// GET all orders in a list
 router.get('/', async (req, res) => {
   try {
     const db = req.app.locals.db;
