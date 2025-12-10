@@ -11,8 +11,8 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
-const client = new MongoClient(process.env.MONGODB_URI)
 let db
+const client = new MongoClient(process.env.MONGODB_URI)
 
 client.connect()
 .then(() => { 
