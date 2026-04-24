@@ -3,29 +3,31 @@ import { ObjectId } from 'mongodb'
 
 const router = express.Router()
 
-// GET all activities
+// GET /api/lessons — return all lessons
 router.get('/', async (req, res) => {
   try {
     const db = req.app.locals.db
-    const lessons = await db.collection('activities').find({}).toArray()
-    res.json(lessons) 
+    const lessons = await db.collection('lessons').find({}).toArray()
+    res.json(lessons)
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to fetch lessons' })
   }
 })
 
-
-// PUT update lesson spaces
+// PUT /api/lessons/:id — update any lesson attribute (e.g. spaces)
 router.put('/:id', async (req, res) => {
   try {
     const db = req.app.locals.db
-    const { spaces } = req.body
-    const result = await db.collection('activities').updateOne(
-      { _id: new ObjectId(req.params.id) },
-      { $set: { spaces } }
-    )
-    res.json(result)
+    const update = { ...req.body }
+    delete update._id
+
+    const filter = ObjectId.isValid(req.params.id)
+      ? { _id: new ObjectId(req.params.id) }
+      : { id: Number(req.params.id) }
+
+    const result = await db.collection('lessons').updateOne(filter, { $set: update })
+    res.json({ success: true, result })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to update lesson' })

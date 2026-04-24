@@ -1,47 +1,41 @@
 import express from 'express'
-import { ObjectId } from 'mongodb'
 
 const router = express.Router()
-// POST new order
+
+// POST /api/orders — save a new order
 router.post('/', async (req, res) => {
   try {
     const db = req.app.locals.db
-    const { name, email, phone, items } = req.body
-    const result = await db.collection('orders').insertOne({ name, email, phone, items, createdAt: new Date() })
+    const { name, phone, lessonIds, numberOfSpaces } = req.body
 
-    res.json({
-      success: true,
-      message: 'Order placed successfully',
-      orderId: result.insertedId 
+    if (!name || !phone || !Array.isArray(lessonIds) || lessonIds.length === 0) {
+      return res.status(400).json({ error: 'Invalid order payload' })
+    }
+
+    const result = await db.collection('orders').insertOne({
+      name,
+      phone,
+      lessonIds,
+      numberOfSpaces: Number(numberOfSpaces) || lessonIds.length,
+      createdAt: new Date()
     })
+
+    res.json({ success: true, orderId: result.insertedId })
   } catch (err) {
     console.error(err)
     res.status(500).json({ error: 'Failed to save order' })
   }
 })
 
-
-// GET all orders in a list
+// GET /api/orders — list all orders (for testing)
 router.get('/', async (req, res) => {
   try {
-    const db = req.app.locals.db;
-    const orders = await db.collection('orders').find().toArray();
-    res.json({ success: true, orders });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ success: false, message: 'Failed to fetch orders' });
-  }
-});
-
-// GET single order by ID
-router.get('/:id', async (req, res) => {
-  try {
     const db = req.app.locals.db
-    const order = await db.collection('orders').findOne({ _id: new ObjectId(req.params.id) })
-    res.json(order)
+    const orders = await db.collection('orders').find().toArray()
+    res.json(orders)
   } catch (err) {
     console.error(err)
-    res.status(500).json({ error: 'Failed to fetch order' })
+    res.status(500).json({ error: 'Failed to fetch orders' })
   }
 })
 

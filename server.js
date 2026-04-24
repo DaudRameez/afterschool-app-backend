@@ -1,38 +1,52 @@
 import express from 'express'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
-import { MongoClient, ObjectId } from 'mongodb'
+import { MongoClient } from 'mongodb'
 import lessonsRoutes from './routes/activitys.js'
 import orderRoutes from './routes/order.js'
 
 dotenv.config()
 
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+
 const app = express()
 app.use(cors())
 app.use(express.json())
 
+// Logger middleware — logs every request
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`)
+  next()
+})
+
+// Static file middleware for lesson images
+const imagesDir = path.join(__dirname, 'public', 'images')
+app.use('/images', express.static(imagesDir))
+
+// Fallback: if an /images/* file was not found, return JSON error
+app.use('/images', (req, res) => {
+  res.status(404).json({ error: 'Image not found' })
+})
+
+// MongoDB Atlas connection (native driver only)
 let db
 const client = new MongoClient(process.env.MONGODB_URI)
-
 client.connect()
-.then(() => { 
+  .then(() => {
     db = client.db('afterschool')
-    app.locals.db = db 
-    console.log('Connected to MongoDB')
-})
-.catch(err => console.error(err))
+    app.locals.db = db
+    console.log('Connected to MongoDB Atlas')
+  })
+  .catch(err => console.error('Mongo connection error:', err))
 
-//Middleware logger 
-app.use(( req, res, next ) => { 
-    console.log(`${req.method} ${req.url}`)
-    next() 
-})
-
-//Routes 
+// Routes
 app.use('/api/lessons', lessonsRoutes)
 app.use('/api/orders', orderRoutes)
 
-//Start Server 
+app.get('/', (req, res) => res.send('After School API is running'))
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
-
